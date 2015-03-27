@@ -1,0 +1,70 @@
+#!/usr/bin/python
+
+import argparse
+import logging
+import sys
+import yaml
+
+import lib.drivers
+
+
+def main():
+  # Parse the command line
+  parser = argparse.ArgumentParser(description="DummySYS")
+  parser.add_argument("--level", "-l", type=str, default="INFO",
+                      choices=["DEBUG", "INFO", "WARN", "ERROR"],
+                      help="Log level; default to INFO")
+  parser.add_argument("--driver", "-d", type=str, required=True,
+                      help="Driver class name")
+  parser.add_argument("--conf", "-c", type=str,
+                      help="Driver configuration")
+  args = parser.parse_args()
+
+  # configure logging
+  FORMAT = "%(asctime)-15s [%(levelname)s] %(message)s"
+  logging.basicConfig(format=FORMAT)
+
+  LOG = logging.getLogger("DummySys")
+  if args.level == "DEBUG":
+    LOG.setLevel(logging.DEBUG)
+  elif args.level == "INFO":
+    LOG.setLevel(logging.INFO)
+  elif args.level == "WARN":
+    LOG.setLevel(logging.WARN)
+  elif args.level == "ERROR":
+    LOG.setLevel(logging.ERROR)
+
+  # Load the yaml file
+  try:
+    with open(args.conf, "r") as f_in:
+      conf = yaml.load(f_in.read())
+    LOG.debug("Config loaded: %s", conf)
+  except (TypeError, IOError, yaml.YAMLError):
+    if args.conf is not None:
+      LOG.error("Unable to load configuration '%s'", args.conf)
+      return 1
+    conf = {}
+
+  # Loading the driver class
+  LOG.info("Loading driver '%s'", args.driver)
+  kls = lib.drivers.load(args.driver)
+
+  # Create an instance of it
+  try:
+    driver = kls.Driver(conf)
+  except Exception as exc:
+    LOG.error("Unable to instanciate the class %s", kls)
+    LOG.exception(exc)
+    return 1
+
+  LOG.debug("name: %s", driver.name)
+  LOG.debug("desc: %s", driver.description)
+
+  LOG.info("Starting %s", driver.name)
+  driver.run()
+
+  return 0
+
+
+if __name__ == "__main__":
+  sys.exit(main())
