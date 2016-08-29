@@ -1,12 +1,17 @@
 #!/usr/bin/python
 
+class Driver(object):
 
-def load(parts):
-  # TODO: handle errors
-  module = __import__(parts)
+    name = "<undefined>"
+    description = "<undefined>"
 
-  for name in parts.split(".")[1:]:
-    # TODO: handle errors
-    module = getattr(module, name)
+    @classmethod
+    def select(cls, name):
+        for subclass in cls.__subclasses__():
+            if subclass.name == name:
+                return subclass
+        raise NotImplementedError("No driver called '%s' found" % name)
 
-  return module
+    def run(self):
+        raise NotImplementedError
+

@@ -5,6 +5,7 @@ import logging
 import sys
 import yaml
 
+from drivers import *
 import lib.drivers
 
 
@@ -47,13 +48,13 @@ def main():
 
   # Loading the driver class
   LOG.info("Loading driver '%s'", args.driver)
-  kls = lib.drivers.load(args.driver)
 
   # Create an instance of it
   try:
-    driver = kls.Driver(conf)
+    kls = lib.drivers.Driver.select(args.driver)
+    driver = kls(conf)
   except Exception as exc:
-    LOG.error("Unable to instanciate the class %s", kls)
+    LOG.error("Unable to load the driver %s", args.driver)
     LOG.exception(exc)
     return 1
 
