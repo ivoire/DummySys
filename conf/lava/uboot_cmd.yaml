@@ -1,5 +1,7 @@
 - cmd: print
   interrupt: True
+  delay: 0
+  jitter: 0.05
   lines:
   - "U-Boot 2014.01 (Nov 04 2015 - 16:20:05) - stm24-2015-06-15"
   - ""
@@ -26,12 +28,16 @@
   - "Hit any key to stop autoboot: 1  "
 
 - cmd: wait
+  delay: 0
+  jitter: 0.05
   for: "boot"
   prompt: "B2120> "
   loop: True
   echo: True
 
 - cmd: print
+  delay: 0.001
+  jitter: 0.005
   lines:
   - "boot"
   - "(Re)start USB..."

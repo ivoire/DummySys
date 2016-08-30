@@ -18,11 +18,10 @@ class UBoot(Driver):
         self.delay = conf.get("delay", 0.001)
         self.jitter = conf.get("jitter", 0.005)
 
-    def out(self, msg, can_interrupt=False):
+    def out(self, msg, delay, can_interrupt=False):
         for c in msg:
             sys.stdout.write(c)
             sys.stdout.flush()
-            delay = self.delay + random.random() * self.jitter
             if can_interrupt:
                 (r, w, x) = select.select([sys.stdin], [], [], delay)
                 if sys.stdin in r:
@@ -34,18 +33,22 @@ class UBoot(Driver):
 
     def cmd_print(self, conf):
         for line in conf["lines"]:
-            if self.out(line, conf.get("interrupt", False)):
+            delay = conf.get("delay", self.delay) + \
+                    random.random() * conf.get("jitter", self.jitter)
+            if self.out(line, delay, conf.get("interrupt", False)):
                 return
 
     def cmd_wait(self, conf):
+        delay = conf.get("delay", self.delay) + \
+                random.random() * conf.get("jitter", self.jitter)
         data = raw_input(conf["prompt"])
         if conf.get("echo", False):
-            self.out(data)
+            self.out(data, delay)
         if conf["loop"]:
             while data != conf["for"]:
                 data = raw_input(conf["prompt"])
                 if conf.get("echo", False):
-                    self.out(data)
+                    self.out(data, delay)
         else:
             raise NotImplementedError
 
