@@ -25,6 +25,8 @@ class UBoot(Driver):
             if can_interrupt:
                 (r, w, x) = select.select([sys.stdin], [], [], delay)
                 if sys.stdin in r:
+                    # Remove the current line
+                    sys.stdin.readline()
                     return True
             else:
                 time.sleep(delay)
