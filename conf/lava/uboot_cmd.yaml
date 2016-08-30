@@ -1,5 +1,4 @@
 - cmd: print
-  interrupt: True
   delay: 0
   jitter: 0.05
   lines:
@@ -17,6 +16,12 @@
   - "Err:   serial"
   - "Net:   stmac-1"
   - "Hit any key to stop autoboot: 10  "
+
+- cmd: print
+  interrupt: True
+  delay: 0
+  jitter: 0.05
+  lines:
   - "Hit any key to stop autoboot: 9  "
   - "Hit any key to stop autoboot: 8  "
   - "Hit any key to stop autoboot: 7  "
@@ -39,7 +44,6 @@
   delay: 0.001
   jitter: 0.005
   lines:
-  - "boot"
   - "(Re)start USB..."
   - "USB0:   Register 2000240 NbrPorts 2"
   - "Starting the controller"
@@ -100,3 +104,20 @@
   - ""
   - "OpenEmbedded nodistro.0 stmarm /dev/ttyAS0"
   - ""
+
+- cmd: wait
+  for: "root"
+  prompt: "stmarm login: "
+  loop: True
+  fail: "Login incorrect"
+
+- cmd: wait
+  for: "export PS1=\"lava-test: # \""
+  prompt: "stmarm:~# "
+  loop: True
+
+- cmd: wait
+  for: "lava-test-runner" # TODO: should be a regexp and should grab a variable
+  prompt: "lava-test: # "
+  loop: true
+  echo: True

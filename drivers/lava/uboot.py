@@ -48,6 +48,8 @@ class UBoot(Driver):
             self.out(data, delay)
         if conf["loop"]:
             while data != conf["for"]:
+                if conf.get("fail", False):
+                    self.out(conf.get("fail"), delay)
                 data = raw_input(conf["prompt"])
                 if conf.get("echo", False):
                     self.out(data, delay)
