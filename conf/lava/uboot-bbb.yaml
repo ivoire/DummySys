@@ -1,0 +1,3 @@
+cmdfile: conf/lava/uboot-bbb-cmd.yaml
+delay: 0
+jitter: 0.05
