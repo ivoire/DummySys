@@ -1,6 +1,6 @@
 - cmd: print
   delay: 0
-  jitter: 0.05
+  jitter: 0.005
   lines:
   - "Trying ::1..."
   - "Trying 127.0.0.1..."
@@ -35,17 +35,22 @@
   - "Hit any key to stop autoboot:  6  "
   - "Hit any key to stop autoboot:  7  "
 
+- cmd: print
+  delay: 0
+  jitter: 0.005
+  lines:
+  - "U-Boot# "
+
 - cmd: wait
   for: "boot"
   prompt: "U-Boot# "
   delay: 0
   jitter: 0.05
-  echo: True
   loop: True
 
 - cmd: print
-  delay: 0.001
-  jitter: 0.005
+  delay: 0
+  jitter: 0.0001
   lines:
   - "link up on port 0, speed 100, full duplex"
   - "BOOTP broadcast 1"
@@ -128,10 +133,6 @@
   - "   Booting using the fdt blob at 0x88000000"
   - "   Using Device Tree in place at 88000000, end 8800a159"
   - ""
-- cmd: print
-  delay: 0
-  jitter: 0.0001
-  lines:
   - "Starting kernel ..."
   - "[    0.000000] Booting Linux on physical CPU 0x0"
   - "[    0.000000] Initializing cgroup subsys cpuset"
