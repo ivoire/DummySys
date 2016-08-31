@@ -46,7 +46,6 @@
   prompt: "U-Boot# "
   delay: 0
   jitter: 0.05
-  loop: True
 
 - cmd: print
   delay: 0
@@ -516,7 +515,6 @@
 - cmd: wait
   for: "root"
   prompt: "jessie login: "
-  loop: true
   fail: "Login incorrect"
 
 - cmd: print
@@ -533,10 +531,56 @@
 - cmd: wait
   for: "export PS1=\"lava-test: # \""
   prompt: "root@jessie:~#  "
-  loop: True
 
 - cmd: wait
-  for: "lava-test-runner" # TODO: should be a regexp and should grab a variable
+  for: "/lava-\\d+/bin/lava-test-runner /lava-(?P<job_id>\\d+)"
   prompt: "lava-test: # "
-  loop: true
-  echo: True
+
+- cmd: print
+  lines:
+  - "/lava-{job_id}"
+  - "<LAVA_TEST_RUNNER>: started"
+  - "<LAVA_TEST_RUNNER>: looking for work in /lava-{job_id}/lava-test-runner.conf-946684817"
+  - "<LAVA_TEST_RUNNER>: running 0_smoke-tests under lava-test-shell..."
+  - "<LAVA_TEST_RUNNER>: save hardware/software context info for 0_smoke-tests..."
+  - "<LAVA_SIGNAL_STARTRUN 0_smoke-tests {job_id}_1.6.2.4.1>"
+  - "<LAVA_SIGNAL_STARTTC linux-linaro-ubuntu-pwd>"
+  - "/lava-{job_id}/tests/0_smoke-tests"
+  - "<LAVA_SIGNAL_ENDTC linux-linaro-ubuntu-pwd>"
+  - "<LAVA_SIGNAL_TESTCASE TEST_CASE_ID=linux-linaro-ubuntu-pwd RESULT=pass>"
+  - "<LAVA_SIGNAL_STARTTC linux-linaro-ubuntu-uname>"
+  - "Linux jessie 3.16.0-4-armmp #1 SMP Debian 3.16.7-ckt20-1+deb8u2 (2016-01-02) armv7l GNU/Linux"
+  - "<LAVA_SIGNAL_ENDTC linux-linaro-ubuntu-uname>"
+  - "<LAVA_SIGNAL_TESTCASE TEST_CASE_ID=linux-linaro-ubuntu-uname RESULT=pass>"
+  - "<LAVA_SIGNAL_STARTTC linux-linaro-ubuntu-vmstat>"
+  - "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----"
+  - "r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st"
+  - "0  0      0 466460      0  22572    0    0   414     0 3231 1366 10 48 40  2  0"
+  - "<LAVA_SIGNAL_ENDTC linux-linaro-ubuntu-vmstat>"
+  - "<LAVA_SIGNAL_TESTCASE TEST_CASE_ID=linux-linaro-ubuntu-vmstat RESULT=pass>"
+  - "<LAVA_SIGNAL_STARTTC linux-linaro-ubuntu-ifconfig>"
+  - "/lava-{job_id}/bin/lava-test-case: line 25: ifconfig: command not found"
+  - "<LAVA_SIGNAL_ENDTC linux-linaro-ubuntu-ifconfig>"
+  - "<LAVA_SIGNAL_TESTCASE TEST_CASE_ID=linux-linaro-ubuntu-ifconfig RESULT=fail>"
+  - "<LAVA_SIGNAL_STARTTC linux-linaro-ubuntu-lscpu>"
+  - "Architecture:          armv7l"
+  - "Byte Order:            Little Endian"
+  - "CPU(s):                1"
+  - "On-line CPU(s) list:   0"
+  - "Thread(s) per core:    1"
+  - "Core(s) per socket:    1"
+  - "Socket(s):             1"
+  - "Model name:            ARMv7 Processor rev 2 (v7l)"
+  - "<LAVA_SIGNAL_ENDTC linux-linaro-ubuntu-lscpu>"
+  - "<LAVA_SIGNAL_TESTCASE TEST_CASE_ID=linux-linaro-ubuntu-lscpu RESULT=pass>"
+  - "<LAVA_SIGNAL_STARTTC linux-linaro-ubuntu-lsb_release>"
+  - "/lava-{job_id}/bin/lava-test-case: line 25: lsb_release: command not found"
+  - "<LAVA_SIGNAL_ENDTC linux-linaro-ubuntu-lsb_release>"
+  - "<LAVA_SIGNAL_TESTCASE TEST_CASE_ID=linux-linaro-ubuntu-lsb_release RESULT=fail>"
+  - "<LAVA_SIGNAL_ENDRUN 0_smoke-tests {job_id}_1.6.2.4.1>"
+  - "<LAVA_TEST_RUNNER>: 0_smoke-tests exited with: 0"
+  - "0_smoke-tests-946684817"
+  - "<LAVA_TEST_RUNNER>: exiting"
+
+- cmd: sleep
+  value: 5
