@@ -15,8 +15,10 @@ def main():
   parser.add_argument("--level", "-l", type=str, default="INFO",
                       choices=["DEBUG", "INFO", "WARN", "ERROR"],
                       help="Log level; default to INFO")
-  parser.add_argument("--driver", "-d", type=str, required=True,
-                      help="Driver class name")
+  parser.add_argument("--driver", "-d", type=str,
+                      help="Driver class name (--list to see the full list)")
+  parser.add_argument('--list', action="store_true",
+                      help="List the available drivers"),
   parser.add_argument("--conf", "-c", type=str,
                       help="Driver configuration")
   args = parser.parse_args()
@@ -34,6 +36,15 @@ def main():
     LOG.setLevel(logging.WARN)
   elif args.level == "ERROR":
     LOG.setLevel(logging.ERROR)
+
+  if args.list:
+      print("Available drivers:")
+      for driver in lib.drivers.Driver.drivers():
+          print("- %s" % driver)
+      return 0
+
+  if args.driver is None:
+      parser.error("--driver is required")
 
   # Load the yaml file
   try:

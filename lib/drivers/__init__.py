@@ -15,3 +15,8 @@ class Driver(object):
     def run(self):
         raise NotImplementedError
 
+    @classmethod
+    def drivers(cls):
+        names = [c.name for c in cls.__subclasses__()]
+        names.sort()
+        return names
