@@ -42,13 +42,16 @@
   - "U-Boot# "
 
 - cmd: wait
-  for: "setenv loadkernel 'tftp ${kernel_addr_r} (?P<tftp_tmpdir>tmp[\\w_]+)/vmlinux"
+  for: "setenv loadkernel 'tftp \\$\\{kernel_addr_r\\} (?P<tftp_tmpdir>tmp[\\w_]+)/vmlinuz"
   prompt: "U-Boot# "
   delay: 0
   jitter: 0.05
 
 - cmd: wait
-  for: "setenv nfsargs 'setenv bootargs console=ttyO0,115200n8 root=/dev/nfs rw nfsroot=(?P<server_ip>(\\d+\\.\\d+\\.\\d+\\.\\d+):/var/lib/lava/dispatcher/tmp/(?P<nfs_tmpdir>tmp[\\w_]+),tcp,hard,intr  ip=dhcp'"
+  for: "setenv nfsargs 'setenv bootargs console=ttyO0,115200n8 root=/dev/nfs rw nfsroot=(?P<server_ip>\\d+\\.\\d+\\.\\d+\\.\\d+):/var/lib/lava/dispatcher/tmp/(?P<nfs_tmpdir>tmp[\\w_]+),tcp,hard,intr  ip=dhcp'"
+  prompt: "U-Boot# "
+  delay: 0
+  jitter: 0.05
 
 - cmd: wait
   for: "boot"
