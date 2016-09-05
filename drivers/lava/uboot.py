@@ -67,15 +67,20 @@ class UBoot(Driver):
                 self.out(conf.get("fail"), delay)
 
     def run(self):
-        LOG = logging.getLogger("DummySys.drivers.lava.uboot")
+        self.execute(self.cmdfile)
 
-        y_conf = yaml.load(open(self.cmdfile))
+    def execute(self, filename):
+        LOG = logging.getLogger("DummySys.drivers.lava.uboot")
+        y_conf = yaml.load(open(filename))
         for cmd in y_conf:
-           if cmd["cmd"] == "wait": 
+            if cmd["cmd"] == "wait":
                 self.cmd_wait(cmd)
-           elif cmd["cmd"] == "print":
+            elif cmd["cmd"] == "print":
                 self.cmd_print(cmd)
-           elif cmd["cmd"] == "sleep":
+            elif cmd["cmd"] == "sleep":
                 self.cmd_sleep(cmd)
-           else:
+            elif cmd["cmd"] == "include":
+                filename = cmd["file"].format(**self.ctx)
+                self.execute(filename)
+            else:
                 raise NotImplementedError
