@@ -18,7 +18,7 @@ class UBoot(Driver):
         self.cmdfile = conf["cmdfile"]
         self.delay = conf.get("delay", 0.001)
         self.jitter = conf.get("jitter", 0.005)
-        self.ctx = {}
+        self.ctx = conf.get("context", {})
 
     def out(self, msg, delay, can_interrupt=False):
         for c in msg:
