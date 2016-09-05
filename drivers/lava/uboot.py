@@ -3,6 +3,7 @@ import random
 import re
 import select
 import sys
+import tarfile
 import time
 import yaml
 
@@ -66,13 +67,24 @@ class UBoot(Driver):
             if conf.get("fail", False):
                 self.out(conf.get("fail"), delay)
 
-    def run(self):
-        self.execute(self.cmdfile)
+    def cmd_include(self, conf):
+        filename = conf["file"].format(**self.ctx)
+        if "archive" in conf:
+            archive = conf["archive"].format(**self.ctx)
+            tar = tarfile.open(archive)
+            filehandler = tar.extractfile(filename)
+        else:
+            filehandler = open(filename)
+        self.execute(filehandler)
 
-    def execute(self, filename):
+    def run(self):
+        self.execute(open(self.cmdfile))
+
+    def execute(self, filehandler):
         LOG = logging.getLogger("DummySys.drivers.lava.uboot")
-        y_conf = yaml.load(open(filename))
+        y_conf = yaml.load(filehandler)
         for cmd in y_conf:
+            LOG.debug("New command: %s", cmd)
             if cmd["cmd"] == "wait":
                 self.cmd_wait(cmd)
             elif cmd["cmd"] == "print":
@@ -80,7 +92,6 @@ class UBoot(Driver):
             elif cmd["cmd"] == "sleep":
                 self.cmd_sleep(cmd)
             elif cmd["cmd"] == "include":
-                filename = cmd["file"].format(**self.ctx)
-                self.execute(filename)
+                self.cmd_include(cmd)
             else:
                 raise NotImplementedError
