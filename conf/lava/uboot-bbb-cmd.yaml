@@ -42,6 +42,15 @@
   - "U-Boot# "
 
 - cmd: wait
+  for: "setenv loadkernel 'tftp ${kernel_addr_r} (?P<tftp_tmpdir>tmp[\\w_]+)/vmlinux"
+  prompt: "U-Boot# "
+  delay: 0
+  jitter: 0.05
+
+- cmd: wait
+  for: "setenv nfsargs 'setenv bootargs console=ttyO0,115200n8 root=/dev/nfs rw nfsroot=(?P<server_ip>(\\d+\\.\\d+\\.\\d+\\.\\d+):/var/lib/lava/dispatcher/tmp/(?P<nfs_tmpdir>tmp[\\w_]+),tcp,hard,intr  ip=dhcp'"
+
+- cmd: wait
   for: "boot"
   prompt: "U-Boot# "
   delay: 0
@@ -53,11 +62,11 @@
   lines:
   - "link up on port 0, speed 100, full duplex"
   - "BOOTP broadcast 1"
-  - "DHCP client bound to address 10.15.2.9"
+  - "DHCP client bound to address {board_ip}"
   - "link up on port 0, speed 100, full duplex"
   - "Using cpsw device"
-  - "TFTP from server 10.3.2.1; our IP address is 10.15.2.9"
-  - "Filename 'tmpTmhAWm/vmlinuz'."
+  - "TFTP from server {server_ip}; our IP address is {board_ip}"
+  - "Filename '{tftp_tmpdir}/vmlinuz'."
   - "Load address: 0x82000000"
   - "Loading: *\b#################################################################"
   - "\t #################################################################"
@@ -68,8 +77,8 @@
   - "Bytes transferred = 3182192 (308e70 hex)"
   - "link up on port 0, speed 100, full duplex"
   - "Using cpsw device"
-  - "TFTP from server 10.3.2.1; our IP address is 10.15.2.9"
-  - "Filename 'tmpTmhAWm/ramdisk.cpio.gz.uboot'."
+  - "TFTP from server {server_ip}; our IP address is {board_ip}"
+  - "Filename '{tftp_tmpdir}/ramdisk.cpio.gz.uboot'."
   - "Load address: 0x83000000"
   - "Loading: *\b#################################################################"
   - "\t #################################################################"
@@ -113,8 +122,8 @@
   - "Bytes transferred = 34901055 (2148c3f hex)"
   - "link up on port 0, speed 100, full duplex"
   - "Using cpsw device"
-  - "TFTP from server 10.3.2.1; our IP address is 10.15.2.9"
-  - "Filename 'tmpTmhAWm/am335x-boneblack.dtb'."
+  - "TFTP from server {server_ip}; our IP address is {board_ip}"
+  - "Filename '{tftp_tmpdir}/am335x-boneblack.dtb'."
   - "Load address: 0x88000000"
   - "Loading: *\b##"
   - "\t 4 MiB/s"
@@ -147,7 +156,7 @@
   - "[    0.000000] AM335X ES2.0 (sgx neon )"
   - "[    0.000000] PERCPU: Embedded 9 pages/cpu @dfac9000 s12608 r8192 d16064 u36864"
   - "[    0.000000] Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 129792"
-  - "[    0.000000] Kernel command line: console=ttyO0,115200n8 root=/dev/nfs rw nfsroot=10.3.2.1:/var/lib/lava/dispatcher/tmp/tmpZngqTr,tcp,hard,intr ip=dhcp"
+  - "[    0.000000] Kernel command line: console=ttyO0,115200n8 root=/dev/nfs rw nfsroot={server_ip}:/var/lib/lava/dispatcher/tmp/{nfs_tmpdir},tcp,hard,intr ip=dhcp"
   - "[    0.000000] PID hash table entries: 2048 (order: 1, 8192 bytes)"
   - "[    0.000000] Dentry cache hash table entries: 65536 (order: 6, 262144 bytes)"
   - "[    0.000000] Inode-cache hash table entries: 32768 (order: 5, 131072 bytes)"
@@ -355,10 +364,10 @@
   - "[    8.624148] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready"
   - "IP-Config: eth0 guessed broadcast address 10.15.255.255"
   - "IP-Config: eth0 complete (dhcp from 10.0.0.2):"
-  - " address: 10.15.2.9        broadcast: 10.15.255.255    netmask: 255.240.0.0     "
+  - " address: {board_ip}        broadcast: {board_broadcast}    netmask: 255.240.0.0     "
   - " gateway: 10.0.0.1         dns0     : 10.0.0.2         dns1   : 0.0.0.0         "
   - " domain : lavalab                                                         "
-  - " rootserver: 10.0.0.2 rootpath: "
+  - " rootserver: {server_ip} rootpath: "
   - " filename  : "
   - "done."
   - "Begin: Running /scripts/nfs-bottom ... done."

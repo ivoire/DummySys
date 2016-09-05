@@ -1,3 +1,6 @@
 cmdfile: conf/lava/uboot-bbb-cmd.yaml
 delay: 0
 jitter: 0.05
+context:
+  board_ip: 10.129.186.101
+  board_broadcast: 10.129.186.255
