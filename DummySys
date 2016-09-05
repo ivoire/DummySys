@@ -45,6 +45,8 @@ def main():
 
   if args.driver is None:
       parser.error("--driver is required")
+  if args.conf is None:
+      parser.error("--conf is required")
 
   # Load the yaml file
   try:
