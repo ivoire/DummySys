@@ -6,7 +6,7 @@ import sys
 import yaml
 
 from drivers import *
-import lib.drivers
+import DummySys.drivers
 
 
 def main():
