@@ -18,10 +18,11 @@
 # along with DummySys.  If not, see <http://www.gnu.org/licenses/>
 
 import logging
-import pexpect.fdpexpect
 import random
+import re
 import select
 import sys
+import tarfile
 import time
 
 
@@ -32,10 +33,12 @@ class FSM(object):
         self.jitter = jitter
         self.ctx = ctx
         self.handlers = {
-            "wait": self.cmd_wait,
+            "execute": self.cmd_execute,
+            "include": self.cmd_include,
             "print": self.cmd_print,
+            "sleep": self.cmd_sleep,
+            "wait": self.cmd_wait,
         }
-        self.connection = pexpect.fdpexpect.fdspawn(sys.stdin, encoding="utf-8", logfile=sys.stdout)
 
     def run(self):
         LOG = logging.getLogger("DummySys.FSM")
@@ -46,7 +49,12 @@ class FSM(object):
             except KeyError:
                 raise NotImplementedError
 
-    def out(self, msg, delay, can_interrupt=False):
+    def _delay(self, conf):
+        delay = conf.get("delay", self.delay)
+        jitter = conf.get("jitter", self.jitter)
+        return delay + random.random() * jitter
+
+    def _out(self, msg, delay, can_interrupt=False):
         for c in msg:
             sys.stdout.write(c)
             sys.stdout.flush()
@@ -61,14 +69,46 @@ class FSM(object):
         sys.stdout.write("\n")
         return False
 
+    def cmd_execute(self, conf):
+        raise NotImplementedError
+
+    def cmd_include(self, conf):
+        filename = conf["file"].format(**self.ctx)
+        if "archive" in conf:
+            archive = conf["archive"].format(**self.ctx)
+            tar = tarfile.open(archive)
+            filehandler = tar.extractfile(filename)
+        else:
+            filehandler = open(filename)
+
+        # Recurse with another state machine
+        fsm = FSM(filehandler.read(), self.delay, self.jitter, self.ctx)
+        fsm.run()
 
     def cmd_print(self, conf):
         for line in conf["lines"]:
             line = line.format(**self.ctx)
-            delay = conf.get("delay", self.delay) + \
-                    random.random() * conf.get("jitter", self.jitter)
-            if self.out(line, delay, conf.get("interrupt", False)):
+            delay = self._delay(conf)
+            if self._out(line, delay, conf.get("interrupt", False)):
                   return
 
+    def cmd_sleep(self, conf):
+        time.sleep(conf["value"])
+
     def cmd_wait(self, conf):
-        pass
+        regexp = re.compile(conf["for"])
+        echo = conf.get("echo", False)
+        fail_string = conf.get("fail", False)
+
+        while True:
+            data = input(conf["prompt"])
+            m = regexp.match(data)
+            if echo:
+                self._out(data, self._delay())
+
+            if m is not None:
+                self.ctx.update(m.groupdict())
+                break
+
+            if fail_string:
+                self.out(fail_string, self.delay())
