@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with DummySys.  If not, see <http://www.gnu.org/licenses/>
 
-import logging
 import random
 import re
 import select
@@ -41,7 +40,6 @@ class FSM(object):
         }
 
     def run(self):
-        LOG = logging.getLogger("DummySys.FSM")
         for cmd in self.cmds:
             LOG.debug("New command: %s", cmd)
             try:

@@ -1,0 +1,79 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# vim: set ts=4
+
+# Copyright 2016 Rémi Duraffort
+# This file is part of DummySys.
+#
+# DummySys is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# DummySys is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with DummySys.  If not, see <http://www.gnu.org/licenses/>
+
+import argparse
+import logging
+import sys
+import yaml
+
+from DummySys.utils import parse_log_level
+from DummySys.fsm import FSM
+
+# Logging level
+FORMAT = "%(asctime)-15s [%(levelname)s] %(message)s"
+
+
+def main():
+    # Configure the argument parser
+    parser = argparse.ArgumentParser(description="lava-board")
+    parser.add_argument("--commands", "-c", type=str, required=True,
+                        help="Commands file")
+    parser.add_argument("--delay", "-d", type=float,
+                        default=0.01, help="Delay when writing on the console")
+    parser.add_argument("--jitter", "-j", type=float,
+                        default=0.01, help="Jitter when writing on the console")
+    parser.add_argument("--context", type=str,
+                        default=None, help="Context file")
+    parser.add_argument("--level", "-l", type=str, default="INFO",
+                        choices=["DEBUG", "INFO", "WARN", "ERROR"],
+                        help="Log level; default to INFO")
+    args = parser.parse_args()
+
+    # Configure the logger
+    LOG = logging.getLogger("lava-board")
+    LOG.setLevel(parse_log_level(args.level))
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(logging.Formatter(FORMAT))
+    LOG.addHandler(handler)
+
+    # Start the state machine
+    LOG.debug("Loading the configuration at %s", args.conf)
+    cmds = []
+    ctx = {}
+    with open(args.commands, "r") as f_in:
+        cmds = yaml.load(f_in.read())
+    if args.context is not None:
+        with open(args.context, "r") as f_in:
+            ctx = yaml.load(f_in.read())
+
+    if not isinstance(cmds, list):
+        LOG.error("The command should be a list.")
+        return
+    if not isinstance(ctx, dict):
+        LOG.error("The context should be a dictionnary.")
+        return
+
+    # Start with an empty context
+    fsm = FSM(cmds, args.delay, args.jitter)
+    fsm.start()
+
+
+if __name__ == "__main__":
+    main()
