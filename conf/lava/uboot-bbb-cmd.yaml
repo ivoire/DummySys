@@ -1,6 +1,6 @@
 - cmd: print
   delay: 0
-  jitter: 0.005
+  jitter: 0.0005
   lines:
   - "Trying ::1..."
   - "Trying 127.0.0.1..."
@@ -37,21 +37,21 @@
 
 - cmd: print
   delay: 0
-  jitter: 0.005
+  jitter: 0.0005
   lines:
   - "U-Boot# "
 
 - cmd: wait
-  for: "setenv loadkernel 'tftp \\$\\{kernel_addr_r\\} (?P<tftp_tmpdir>tmp[\\w_]+)/vmlinuz"
+  for: "setenv loadkernel 'tftp \\$\\{kernel_addr_r\\} (?P<tftp_tmpdir>[\\w_/-]+)/vmlinuz"
   prompt: "U-Boot# "
   delay: 0
-  jitter: 0.05
+  jitter: 0.0005
 
 - cmd: wait
-  for: "setenv nfsargs 'setenv bootargs console=ttyO0,115200n8 root=/dev/nfs rw nfsroot=(?P<server_ip>\\d+\\.\\d+\\.\\d+\\.\\d+):/var/lib/lava/dispatcher/tmp/(?P<nfs_tmpdir>tmp[\\w_]+),tcp,hard,intr  ip=dhcp'"
+  for: "setenv nfsargs 'setenv bootargs console=ttyO0,115200n8 root=/dev/nfs rw nfsroot=(?P<server_ip>\\d+\\.\\d+\\.\\d+\\.\\d+):/var/lib/lava/dispatcher/tmp/(?P<nfs_tmpdir>\\d+/[\\w_-]+),tcp,hard,intr  ip=dhcp'"
   prompt: "U-Boot# "
   delay: 0
-  jitter: 0.05
+  jitter: 0.0005
 
 - cmd: wait
   for: "boot"
@@ -61,7 +61,7 @@
 
 - cmd: print
   delay: 0
-  jitter: 0.0001
+  jitter: 0.00001
   lines:
   - "link up on port 0, speed 100, full duplex"
   - "BOOTP broadcast 1"
@@ -543,10 +543,18 @@
 - cmd: wait
   for: "export PS1=\"lava-test: # \""
   prompt: "root@jessie:~#  "
+  delay: 0
+  jitter: 0.0001
 
 - cmd: wait
   for: "/lava-\\d+/bin/lava-test-runner /lava-(?P<job_id>\\d+)"
   prompt: "lava-test: # "
+  delay: 0
+  jitter: 0.0001
+
+#- cmd: include
+#  archive: "/tmp/lava-dispatcher/slave/{job_id}/logs/overlay-1.6.2.5.tar.gz"
+#  file: "./lava-{job_id}/tests/0_test-results-parser/bbb-cmd.yaml"
 
 - cmd: print
   lines:
