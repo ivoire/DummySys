@@ -20,6 +20,7 @@
 import random
 import re
 import select
+import subprocess
 import sys
 import tarfile
 import time
@@ -67,7 +68,13 @@ class FSM(object):
         return False
 
     def cmd_execute(self, conf):
-        raise NotImplementedError
+        args = []
+        for arg in conf["args"]:
+            args.append(arg.format(**self.ctx))
+        ret = subprocess.call(args)
+        if ret in conf["quit_on"]:
+            msg = conf["quit_on"][ret]
+            raise Exception(msg)
 
     def cmd_include(self, conf):
         filename = conf["file"].format(**self.ctx)
