@@ -1,3 +1,0 @@
-job_id: 123456
-log_uri: tcp://localhost:5555
-logfile: share/lava/logs/kvm-inline.yaml

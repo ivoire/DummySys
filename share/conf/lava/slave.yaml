@@ -1,5 +1,0 @@
-hostname: pandore.cec-lab.gnb.st.com
-send_queue: 10
-master_uri: tcp://localhost:5556
-log_uri: tcp://localhost:5555
-timeout: 5

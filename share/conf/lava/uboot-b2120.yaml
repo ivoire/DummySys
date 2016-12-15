@@ -1,3 +1,0 @@
-cmdfile: conf/lava/uboot-b2120-cmd.yaml
-delay: 0
-jitter: 0.05
