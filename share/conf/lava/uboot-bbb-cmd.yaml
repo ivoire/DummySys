@@ -42,7 +42,19 @@
   - "U-Boot# "
 
 - cmd: wait
-  for: "setenv loadkernel 'tftp \\$\\{kernel_addr_r\\} (?P<tftp_tmpdir>[\\w_/-]+)/vmlinuz"
+  for: "setenv loadkernel 'tftp \\$\\{kernel_addr_r\\} (?P<tftp_vmlinux>[\\w_/-]+vmlinuz)"
+  prompt: "U-Boot# "
+  delay: 0
+  jitter: 0.0005
+
+- cmd: wait
+  for: "setenv loadinitrd 'tftp \\$\\{initrd_addr_r\\} (?P<tftp_ramdisk>[\\w_/-]+ramdisk.cpio.gz.uboot)"
+  prompt: "U-Boot# "
+  delay: 0
+  jitter: 0.0005
+
+- cmd: wait
+  for: "setenv loadfdt 'tftp \\$\\{fdt_addr_r\\} (?P<tftp_dtb>[\\w_/-]+am335x-boneblack.dtb)"
   prompt: "U-Boot# "
   delay: 0
   jitter: 0.0005
@@ -69,7 +81,22 @@
   - "link up on port 0, speed 100, full duplex"
   - "Using cpsw device"
   - "TFTP from server {server_ip}; our IP address is {board_ip}"
-  - "Filename '{tftp_tmpdir}/vmlinuz'."
+  - "Filename '{tftp_vmlinux}'."
+
+- cmd: execute
+  args:
+  - "python3"
+  - "/home/ivoire/projects/DummySys/share/utils/tftp.get.py"
+  - "--host"
+  - "{server_ip}"
+  - "{tftp_vmlinux}"
+  quit_on:
+    1: "Unable to download the file"
+
+- cmd: print
+  delay: 0
+  jitter: 0.00001
+  lines:
   - "Load address: 0x82000000"
   - "Loading: *\b#################################################################"
   - "\t #################################################################"
@@ -81,7 +108,22 @@
   - "link up on port 0, speed 100, full duplex"
   - "Using cpsw device"
   - "TFTP from server {server_ip}; our IP address is {board_ip}"
-  - "Filename '{tftp_tmpdir}/ramdisk.cpio.gz.uboot'."
+  - "Filename '{tftp_ramdisk}'."
+
+- cmd: execute
+  args:
+  - "python3"
+  - "/home/ivoire/projects/DummySys/share/utils/tftp.get.py"
+  - "--host"
+  - "{server_ip}"
+  - "{tftp_ramdisk}"
+  quit_on:
+    1: "Unable to download the file"
+
+- cmd: print
+  delay: 0
+  jitter: 0.00001
+  lines:
   - "Load address: 0x83000000"
   - "Loading: *\b#################################################################"
   - "\t #################################################################"
@@ -126,7 +168,22 @@
   - "link up on port 0, speed 100, full duplex"
   - "Using cpsw device"
   - "TFTP from server {server_ip}; our IP address is {board_ip}"
-  - "Filename '{tftp_tmpdir}/am335x-boneblack.dtb'."
+  - "Filename '{tftp_dtb}'."
+
+- cmd: execute
+  args:
+  - "python3"
+  - "/home/ivoire/projects/DummySys/share/utils/tftp.get.py"
+  - "--host"
+  - "{server_ip}"
+  - "{tftp_dtb}"
+  quit_on:
+    1: "Unable to download the file"
+
+- cmd: print
+  delay: 0
+  jitter: 0.00001
+  lines:
   - "Load address: 0x88000000"
   - "Loading: *\b##"
   - "\t 4 MiB/s"
