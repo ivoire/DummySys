@@ -41,7 +41,6 @@ class FSM(object):
 
     def run(self):
         for cmd in self.cmds:
-            LOG.debug("New command: %s", cmd)
             try:
                 self.handlers[cmd['cmd']](cmd)
             except KeyError:

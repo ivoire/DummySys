@@ -54,7 +54,7 @@ def main():
     LOG.addHandler(handler)
 
     # Start the state machine
-    LOG.debug("Loading the configuration at %s", args.conf)
+    LOG.debug("Loading the commands at %s", args.commands)
     cmds = []
     ctx = {}
     with open(args.commands, "r") as f_in:
@@ -71,8 +71,8 @@ def main():
         return
 
     # Start with an empty context
-    fsm = FSM(cmds, args.delay, args.jitter)
-    fsm.start()
+    fsm = FSM(cmds, args.delay, args.jitter, ctx)
+    fsm.run()
 
 
 if __name__ == "__main__":
