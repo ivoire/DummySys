@@ -108,11 +108,11 @@ class FSM(object):
             data = input(conf["prompt"])
             m = regexp.match(data)
             if echo:
-                self._out(data, self._delay())
+                self._out(data, self._delay(conf))
 
             if m is not None:
                 self.ctx.update(m.groupdict())
                 break
 
             if fail_string:
-                self.out(fail_string, self.delay())
+                self._out(fail_string, self._delay(conf))
