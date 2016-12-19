@@ -60,7 +60,7 @@ class FSM(object):
             sys.stdout.write(c)
             sys.stdout.flush()
             if can_interrupt:
-                (r, w, x) = select.select([sys.stdin], [], [], delay)
+                (r, _, _) = select.select([sys.stdin], [], [], delay)
                 if sys.stdin in r:
                     # Remove the current line
                     sys.stdin.readline()
@@ -97,7 +97,7 @@ class FSM(object):
             line = line.format(**self.ctx)
             delay = self._delay(conf)
             if self._out(line, delay, conf.get("interrupt", False)):
-                  return
+                return
 
     def cmd_sleep(self, conf):
         time.sleep(conf["value"])

@@ -27,7 +27,7 @@ class Driver(object):
         for sub in cls.subclasses():
             if sub.classname == classname:
                 return sub
-        raise NotImplementedError("No driver called '%s' found" % name)
+        raise NotImplementedError("No driver called '%s' found" % classname)
 
     def run(self):
         raise NotImplementedError
