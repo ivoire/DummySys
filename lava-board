@@ -47,7 +47,7 @@ def main():
     args = parser.parse_args()
 
     # Configure the logger
-    LOG = logging.getLogger("lava-board")
+    LOG = logging.getLogger("DummySys")
     LOG.setLevel(parse_log_level(args.level))
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(logging.Formatter(FORMAT))

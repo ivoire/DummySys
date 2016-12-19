@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with DummySys.  If not, see <http://www.gnu.org/licenses/>
 
+import logging
 import random
 import re
 import select
@@ -41,9 +42,11 @@ class FSM(object):
         }
 
     def run(self):
+        self.LOG = logging.getLogger("DummySys.fsm")
         for cmd in self.cmds:
+            self.LOG.debug("Command: %s", cmd["cmd"])
             try:
-                self.handlers[cmd['cmd']](cmd)
+                self.handlers[cmd["cmd"]](cmd)
             except KeyError:
                 raise NotImplementedError
 
@@ -100,6 +103,7 @@ class FSM(object):
         time.sleep(conf["value"])
 
     def cmd_wait(self, conf):
+        self.LOG.debug(" for: %s", conf["for"])
         regexp = re.compile(conf["for"])
         echo = conf.get("echo", False)
         fail_string = conf.get("fail", False)
