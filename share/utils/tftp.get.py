@@ -27,7 +27,7 @@ import tempfile
 
 
 def main():
-    parser = argparse.ArgumentParser(description="lava-board")
+    parser = argparse.ArgumentParser(description="tftp.get.py")
     parser.add_argument("--host", type=str, default="localhost",
                         help="Hostname of the tftp server")
     parser.add_argument("--port", type=int, default=69,
@@ -41,7 +41,7 @@ def main():
     base_dir = os.getcwd()
     os.chdir(tmp)
 
-    p = pexpect.spawnu("tftp")
+    p = pexpect.spawn("tftp", encoding="utf-8")
     p.expect("tftp> ")
     p.sendline("connect %s %d" % (args.host, args.port))
     p.expect("tftp> ")
