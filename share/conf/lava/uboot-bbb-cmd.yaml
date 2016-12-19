@@ -412,7 +412,8 @@
   - "[    5.460827] RPC: Registered tcp transport module."
   - "[    5.465745] RPC: Registered tcp NFSv4.1 backchannel transport module."
   - "[    5.496958] FS-Cache: Netfs 'nfs' registered for caching"
-  - "IP-Config: eth0 hardware address c8:a0:30:c4:06:[    5.535172] net eth0: initializing cpsw version 1.12 (0)"
+  - "IP-Config: eth0 hardware address c8:a0:30:c4:06:"
+  - "[    5.535172] net eth0: initializing cpsw version 1.12 (0)"
   - "52 mtu 1500 DHCP"
   - "[    5.547445] net eth0: phy found : id is : 0x7c0f1"
   - "[    5.552534] libphy: PHY 4a101000.mdio:01 not found"
@@ -429,6 +430,23 @@
   - " domain : lavalab                                                         "
   - " rootserver: {server_ip} rootpath: "
   - " filename  : "
+
+- cmd: execute
+  args:
+  - "python3"
+  - "/home/ivoire/projects/DummySys/share/utils/mount.py"
+  - "--host"
+  - "{server_ip}"
+  - "--path"
+  - "/var/lib/lava/dispatcher/tmp/"
+  - "{nfs_tmpdir}/bin/bash"
+  quit_on:
+    1: "Unable to mount the nfs rootfs"
+
+- cmd: print
+  delay: 0
+  jitter: 0.00001
+  lines:
   - "done."
   - "Begin: Running /scripts/nfs-bottom ... done."
   - "Begin: Running /scripts/init-bottom ... done."
