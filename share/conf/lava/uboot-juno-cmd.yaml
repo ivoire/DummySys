@@ -164,6 +164,30 @@
   - "VExpress64# "
 
 - cmd: wait
+  for: "setenv loadkernel 'tftp \\$\\{kernel_addr_r\\} (?P<tftp_vmlinux>[\\w_/-]+Image)'"
+  prompt: "VExpress64# "
+  delay: 0
+  jitter: 0.0005
+
+- cmd: wait
+  for: "setenv loadinitrd 'tftp \\$\\{initrd_addr_r\\} (?P<tftp_ramdisk>[\\w_/-]+ramdisk.img)"
+  prompt: "VExpress64# "
+  delay: 0
+  jitter: 0.0005
+
+- cmd: wait
+  for: "setenv loadfdt 'tftp \\$\\{fdt_addr_r\\} (?P<tftp_dtb>[\\w_/-]+juno.dtb)'"
+  prompt: "VExpress64# "
+  delay: 0
+  jitter: 0.0005
+
+- cmd: wait
+  for: "setenv bootargs 'console=ttyAMA0,115200n8 root=/dev/nfs nfsroot=(?P<server_ip>\\d+\\.\\d+\\.\\d+\\.\\d+):/var/lib/lava/dispatcher/tmp/(?P<nfs_tmpdir>\\d+/[\\w_-]+),tcp,hard,intr ip=dhcp"
+  prompt: "VExpress64# "
+  delay: 0
+  jitter: 0.0005
+
+- cmd: wait
   for: boot
   delay: 0
   jitter: 0.0005
@@ -186,8 +210,23 @@
   - "smc911x: phy initialized"
   - "smc911x: MAC 00:02:f7:00:58:37"
   - "Using smc911x-0 device"
-  - "TFTP from server 10.3.2.1; our IP address is 10.7.0.13"
-  - "Filename '158370/tftp-deploy-Ccp7OE/Image'."
+  - "TFTP from server {server_ip}; our IP address is {board_ip}"
+  - "Filename '{tftp_vmlinux}'."
+
+- cmd: execute
+  args:
+  - "python3"
+  - "/home/ivoire/projects/DummySys/share/utils/tftp.get.py"
+  - "--host"
+  - "{server_ip}"
+  - "{tftp_vmlinux}"
+  quit_on:
+    1: "Unable to download the file"
+
+- cmd: print
+  delay: 0
+  jitter: 0.00001
+  lines:
   - "Load address: 0x80080000"
   - "Loading: #################################################################"
   - "   #################################################################"
@@ -211,8 +250,23 @@
   - "smc911x: phy initialized"
   - "smc911x: MAC 00:02:f7:00:58:37"
   - "Using smc911x-0 device"
-  - "TFTP from server 10.3.2.1; our IP address is 10.7.0.13"
-  - "Filename '158370/tftp-deploy-Ccp7OE/ramdisk.img'."
+  - "TFTP from server {server_ip}; our IP address is {board_ip}"
+  - "Filename '{tftp_ramdisk}'."
+
+- cmd: execute
+  args:
+  - "python3"
+  - "/home/ivoire/projects/DummySys/share/utils/tftp.get.py"
+  - "--host"
+  - "{server_ip}"
+  - "{tftp_ramdisk}"
+  quit_on:
+    1: "Unable to download the file"
+
+- cmd: print
+  delay: 0
+  jitter: 0.00001
+  lines:
   - "Load address: 0x84000000"
   - "Loading: #"
   - "   0 Bytes/s"
@@ -224,8 +278,23 @@
   - "smc911x: phy initialized"
   - "smc911x: MAC 00:02:f7:00:58:37"
   - "Using smc911x-0 device"
-  - "TFTP from server 10.3.2.1; our IP address is 10.7.0.13"
-  - "Filename '158370/tftp-deploy-Ccp7OE/juno.dtb'."
+  - "TFTP from server {server_ip}; our IP address is {board_ip}"
+  - "Filename '{tftp_dtb}'."
+
+- cmd: execute
+  args:
+  - "python3"
+  - "/home/ivoire/projects/DummySys/share/utils/tftp.get.py"
+  - "--host"
+  - "{server_ip}"
+  - "{tftp_dtb}"
+  quit_on:
+    1: "Unable to download the file"
+
+- cmd: print
+  delay: 0
+  jitter: 0.00001
+  lines:
   - "Load address: 0x83000000"
   - "Loading: ##"
   - "   3.9 KiB/s"
@@ -270,7 +339,7 @@
   - "[    0.000000] CPU features: enabling workaround for ARM errata 826319, 827319, 824069"
   - "[    0.000000] CPU features: enabling workaround for ARM erratum 845719"
   - "[    0.000000] Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 2064384"
-  - "[    0.000000] Kernel command line: console=ttyAMA0,115200n8 root=/dev/nfs nfsroot=10.3.2.1:/var/lib/lava/dispatcher/tmp/158370/extract-nfsrootfs-vuCSW8,tcp,hard,intr ip=dhcp rw rootwait earlycon=pl011,0x7ff80000 debug systemd.log_target=null user_debug=31 androidboot.hardware=juno loglevel=9"
+  - "[    0.000000] Kernel command line: console=ttyAMA0,115200n8 root=/dev/nfs nfsroot={server_ip}:/var/lib/lava/dispatcher/tmp/{nfs_tmpdir},tcp,hard,intr ip=dhcp rw rootwait earlycon=pl011,0x7ff80000 debug systemd.log_target=null user_debug=31 androidboot.hardware=juno loglevel=9"
   - "[    0.000000] PID hash table entries: 4096 (order: 3, 32768 bytes)"
   - "[    0.000000] Dentry cache hash table entries: 1048576 (order: 11, 8388608 bytes)"
   - "[    0.000000] Inode-cache hash table entries: 524288 (order: 10, 4194304 bytes)"
@@ -487,14 +556,31 @@
   - "[    7.047103] Sending DHCP requests ., OK"
   - "[    7.099630] IP-Config: Got DHCP answer from 10.0.0.2, my address is 10.7.0.13"
   - "[    7.107103] IP-Config: Complete:"
-  - "[    7.110309]      device=eth0, hwaddr=00:02:f7:00:58:37, ipaddr=10.7.0.13, mask=255.240.0.0, gw=10.0.0.1"
+  - "[    7.110309]      device=eth0, hwaddr=00:02:f7:00:58:37, ipaddr={board_ip}, mask=255.240.0.0, gw=10.0.0.1"
   - "[    7.119638]      host=10.7.0.13, domain=lavalab, nis-domain=(none)"
-  - "[    7.125781]      bootserver=10.0.0.10, rootserver=10.3.2.1, rootpath=     nameserver0=10.0.0.2"
+  - "[    7.125781]      bootserver=10.0.0.10, rootserver={server_ip}, rootpath=     nameserver0=10.0.0.2"
   - "[    7.134369] ALSA device list:"
   - "[    7.137331]   #0: 7ff90000.i2s-i2s-hifi"
   - "[    7.141328] uart-pl011 7ff80000.uart: no DMA platform data"
   - "[    7.146946] RAMDISK: Couldn't find valid RAM disk image starting at 0."
   - "[    7.253018] VFS: Mounted root (nfs filesystem) on device 0:16."
+
+- cmd: execute
+  args:
+  - "python3"
+  - "/home/ivoire/projects/DummySys/share/utils/mount.py"
+  - "--host"
+  - "{server_ip}"
+  - "--path"
+  - "/var/lib/lava/dispatcher/tmp/"
+  - "{nfs_tmpdir}/bin/bash"
+  quit_on:
+    1: "Unable to mount the nfs rootfs"
+
+- cmd: print
+  delay: 0
+  jitter: 0.00001
+  lines:
   - "[    7.259756] devtmpfs: mounted"
   - "[    7.263291] Freeing unused kernel memory: 768K (ffffffc000a80000 - ffffffc000b40000)"
   - "Welcome to [1mDebian GNU/Linux jessie/sid[0m!"
@@ -653,7 +739,7 @@
   jitter: 0.0001
 
 - cmd: wait
-  for: "/usr/bin/wget --no-check-certificate --no-proxy --connect-timeout=30"
+  for: "/usr/bin/wget --no-check-certificate --no-proxy --connect-timeout=30 -S --progress=dot:giga -O - (?P<img_url>http://\\d+\\.\\d+\\.\\d+\\.\\d+/tmp/\\d+/[\\w_-]+/juno.img)"
   prompt: "lava-test: #"
   delay: 0
   jitter: 0.0001
@@ -662,90 +748,24 @@
   delay: 0
   jitter: 0.0001
   lines:
-  - "converted 'http://10.3.2.1/tmp/158370/storage-deploy-ppl_fz/juno.img' (ANSI_X3.4-1968) -> 'http://10.3.2.1/tmp/158370/storage-deploy-ppl_fz/juno.img' (UTF-8)"
-  - "--2016-12-21 13:28:43--  http://10.3.2.1/tmp/158370/storage-deploy-ppl_fz/juno.img"
-  - "Connecting to 10.3.2.1:80... connected."
-  - "HTTP request sent, awaiting response... "
-  - "  HTTP/1.1 200 OK"
-  - "  Date: Wed, 21 Dec 2016 13:28:44 GMT"
-  - "  Server: Apache/2.4.10 (Debian)"
-  - "  Last-Modified: Wed, 21 Dec 2016 13:28:29 GMT"
-  - "  ETag: \"80000000-5442b20daa03c\""
-  - "  Accept-Ranges: bytes"
-  - "  Content-Length: 2147483648"
-  - "  Keep-Alive: timeout=5, max=100"
-  - "  Connection: Keep-Alive"
-  - "Length: 2147483648 (2.0G)"
-  - "Saving to: 'STDOUT'"
-  - "     0K ........ ........ ........ ........  1% 7.08M 4m45s"
-  - " 32768K ........ ........ ........ ........  3% 5.56M 5m18s"
-  - " 65536K ........ ........ ........ ........  4% 4.78M 5m45s"
-  - " 98304K ........ ........ ........ ........  6% 4.84M 5m54s"
-  - "131072K ........ ........ ........ ........  7% 4.86M 5m56s"
-  - "163840K ........ ........ ........ ........  9% 5.19M 5m51s"
-  - "196608K ........ ........ ........ ........ 10% 4.85M 5m50s"
-  - "229376K ........ ........ ........ ........ 12% 5.00M 5m45s"
-  - "262144K ........ ........ ........ ........ 14% 4.91M 5m41s"
-  - "294912K ........ ........ ........ ........ 15% 4.78M 5m38s"
-  - "327680K ........ ........ ........ ........ 17% 4.83M 5m33s"
-  - "360448K ........ ........ ........ ........ 18% 4.73M 5m29s"
-  - "393216K ........ ........ ........ ........ 20% 5.18M 5m22s"
-  - "425984K ........ ........ ........ ........ 21% 4.75M 5m17s"
-  - "458752K ........ ........ ........ ........ 23% 4.94M 5m11s"
-  - "491520K ........ ........ ........ ........ 25% 4.76M 5m6s"
-  - "524288K ........ ........ ........ ........ 26% 4.99M 5m0s"
-  - "557056K ........ ........ ........ ........ 28% 5.01M 4m54s"
-  - "589824K ........ ........ ........ ........ 29% 5.06M 4m47s"
-  - "622592K ........ ........ ........ ........ 31% 4.99M 4m41s"
-  - "655360K ........ ........ ........ ........ 32% 4.95M 4m35s"
-  - "688128K ........ ........ ........ ........ 34% 4.87M 4m28s"
-  - "720896K ........ ........ ........ ........ 35% 4.96M 4m22s"
-  - "753664K ........ ........ ........ ........ 37% 4.90M 4m16s"
-  - "786432K ........ ........ ........ ........ 39% 4.70M 4m10s"
-  - "819200K ........ ........ ........ ........ 40% 4.80M 4m4s"
-  - "851968K ........ ........ ........ ........ 42% 4.72M 3m58s"
-  - "884736K ........ ........ ........ ........ 43% 5.15M 3m52s"
-  - "917504K ........ ........ ........ ........ 45% 4.88M 3m45s"
-  - "950272K ........ ........ ........ ........ 46% 4.93M 3m39s"
-  - "983040K ........ ........ ........ ........ 48% 4.82M 3m33s"
-  - "1015808K ........ ........ ........ ........ 50% 4.73M 3m27s"
-  - "1048576K ........ ........ ........ ........ 51% 4.93M 3m20s"
-  - "1081344K ........ ........ ........ ........ 53% 4.96M 3m14s"
-  - "1114112K ........ ........ ........ ........ 54% 4.89M 3m7s"
-  - "1146880K ........ ........ ........ ........ 56% 5.14M 3m1s"
-  - "1179648K ........ ........ ........ ........ 57% 4.82M 2m54s"
-  - "1212416K ........ ........ ........ ........ 59% 4.82M 2m48s"
-  - "1245184K ........ ........ ........ ........ 60% 4.70M 2m42s"
-  - "1277952K ........ ........ ........ ........ 62% 4.73M 2m35s"
-  - "1310720K ........ ........ ........ ........ 64% 4.72M 2m29s"
-  - "1343488K ........ ........ ........ ........ 65% 4.86M 2m23s"
-  - "1376256K ........ ........ ........ ........ 67% 4.75M 2m16s"
-  - "1409024K ........ ........ ........ ........ 68% 5.08M 2m10s"
-  - "1441792K ........ ........ ........ ........ 70% 4.96M 2m3s"
-  - "1474560K ........ ........ ........ ........ 71% 4.99M 1m57s"
-  - "1507328K ........ ........ ........ ........ 73% 5.06M 1m50s"
-  - "1540096K ........ ........ ........ ........ 75% 4.84M 1m44s"
-  - "1572864K ........ ........ ........ ........ 76% 5.10M 97s"
-  - "1605632K ........ ........ ........ ........ 78% 4.69M 91s"
-  - "1638400K ........ ........ ........ ........ 79% 4.75M 84s"
-  - "1671168K ........ ........ ........ ........ 81% 4.99M 78s"
-  - "1703936K ........ ........ ........ ........ 82% 4.84M 71s"
-  - "1736704K ........ ........ ........ ........ 84% 4.89M 65s"
-  - "1769472K ........ ........ ........ ........ 85% 4.96M 58s"
-  - "1802240K ........ ........ ........ ........ 87% 4.87M 52s"
-  - "1835008K ........ ........ ........ ........ 89% 4.90M 45s"
-  - "1867776K ........ ........ ........ ........ 90% 4.87M 39s"
-  - "1900544K ........ ........ ........ ........ 92% 5.06M 32s"
-  - "1933312K ........ ........ ........ ........ 93% 4.67M 26s"
-  - "1966080K ........ ........ ........ ........ 95% 4.82M 20s"
-  - "1998848K ........ ........ ........ ........ 96% 5.13M 13s"
-  - "2031616K ........ ........ ........ ........ 98% 4.94M 6s"
-  - "2064384K ........ ........ ........ ........100% 4.84M 0s"
-  - "2097152K                                    100% 0.00 =6m56s"
-  - "2016-12-21 13:35:39 (4.92 MB/s) - written to stdout [2147483648/2147483648]"
-  - "0+35093 records in"
-  - "0+35093 records out"
-  - "2147483648 bytes (2.1 GB) copied, 796.685 s, 2.7 MB/s"
+  - "converted '{img_url}' (ANSI_X3.4-1968) -> '{img_url}' (UTF-8)"
+
+- cmd: execute
+  args:
+  - "/usr/bin/wget"
+  - "-S"
+  - "--progress=dot:giga"
+  - "{img_url}"
+  - "-O"
+  - "/dev/null"
+  quit_on:
+    4: "Host unreachable"
+    8: "File does not exist"
+
+- cmd: print
+  delay: 0
+  jitter: 0.0001
+  lines:
   - "Secondary media deployment complete"
 
 - cmd: wait
@@ -985,6 +1005,24 @@
   - "VExpress64# "
 
 - cmd: wait
+  for: "setenv loadkernel 'tftp \\$\\{kernel_addr_r\\} (?P<tftp_vmlinux>[\\w_/-]+kernel)'"
+  prompt: "VExpress64# "
+  delay: 0
+  jitter: 0.0005
+
+- cmd: wait
+  for: "setenv loadinitrd 'tftp \\$\\{initrd_addr_r\\} (?P<tftp_ramdisk>[\\w_/-]+ramdisk.cpio.gz.uboot)"
+  prompt: "VExpress64# "
+  delay: 0
+  jitter: 0.0005
+
+- cmd: wait
+  for: "setenv loadfdt 'tftp \\$\\{fdt_addr_r\\} (?P<tftp_dtb>[\\w_/-]+juno.dtb)'"
+  prompt: "VExpress64# "
+  delay: 0
+  jitter: 0.0005
+
+- cmd: wait
   for: boot
   delay: 0
   jitter: 0.0005
@@ -1007,8 +1045,23 @@
   - "smc911x: phy initialized"
   - "smc911x: MAC 00:02:f7:00:58:37"
   - "Using smc911x-0 device"
-  - "TFTP from server 10.3.2.1; our IP address is 10.7.0.13"
-  - "Filename '158370/tftp-deploy-NGFHwk/kernel'."
+  - "TFTP from server {server_ip}; our IP address is {board_ip}"
+  - "Filename '{tftp_vmlinux}'."
+
+- cmd: execute
+  args:
+  - "python3"
+  - "/home/ivoire/projects/DummySys/share/utils/tftp.get.py"
+  - "--host"
+  - "{server_ip}"
+  - "{tftp_vmlinux}"
+  quit_on:
+    1: "Unable to download the file"
+
+- cmd: print
+  delay: 0
+  jitter: 0.00001
+  lines:
   - "Load address: 0x80080000"
   - "Loading: #################################################################"
   - "   #################################################################"
@@ -1035,8 +1088,23 @@
   - "smc911x: phy initialized"
   - "smc911x: MAC 00:02:f7:00:58:37"
   - "Using smc911x-0 device"
-  - "TFTP from server 10.3.2.1; our IP address is 10.7.0.13"
-  - "Filename '158370/tftp-deploy-NGFHwk/ramdisk.cpio.gz.uboot'."
+  - "TFTP from server {server_ip}; our IP address is {board_ip}"
+  - "Filename '{tftp_ramdisk}'."
+
+- cmd: execute
+  args:
+  - "python3"
+  - "/home/ivoire/projects/DummySys/share/utils/tftp.get.py"
+  - "--host"
+  - "{server_ip}"
+  - "{tftp_ramdisk}"
+  quit_on:
+    1: "Unable to download the file"
+
+- cmd: print
+  delay: 0
+  jitter: 0.00001
+  lines:
   - "Load address: 0x84000000"
   - "Loading: #################################################################"
   - "   ####################################"
@@ -1049,8 +1117,23 @@
   - "smc911x: phy initialized"
   - "smc911x: MAC 00:02:f7:00:58:37"
   - "Using smc911x-0 device"
-  - "TFTP from server 10.3.2.1; our IP address is 10.7.0.13"
-  - "Filename '158370/tftp-deploy-NGFHwk/juno.dtb'."
+  - "TFTP from server {server_ip}; our IP address is {board_ip}"
+  - "Filename '{tftp_dtb}'."
+
+- cmd: execute
+  args:
+  - "python3"
+  - "/home/ivoire/projects/DummySys/share/utils/tftp.get.py"
+  - "--host"
+  - "{server_ip}"
+  - "{tftp_dtb}"
+  quit_on:
+    1: "Unable to download the file"
+
+- cmd: print
+  delay: 0
+  jitter: 0.00001
+  lines:
   - "Load address: 0x83000000"
   - "Loading: ##"
   - "   2.9 KiB/s"
@@ -1414,7 +1497,7 @@
   - "[    5.577371] Sending DHCP requests ., OK"
   - "[    5.617388] IP-Config: Got DHCP answer from 10.0.0.2, my address is 10.7.0.13"
   - "[    5.633468] IP-Config: Complete:"
-  - "[    5.636662]      device=eth0, hwaddr=00:02:f7:00:58:37, ipaddr=10.7.0.13, mask=255.240.0.0, gw=10.0.0.1"
+  - "[    5.636662]      device=eth0, hwaddr=00:02:f7:00:58:37, ipaddr={board_ip}, mask=255.240.0.0, gw=10.0.0.1"
   - "[    5.645978]      host=10.7.0.13, domain=lavalab, nis-domain=(none)"
   - "[    5.652105]      bootserver=10.0.0.10, rootserver=10.0.0.10, rootpath="
   - "[    5.658398]      nameserver0=10.0.0.2"
