@@ -739,7 +739,7 @@
   jitter: 0.0001
 
 - cmd: wait
-  for: "/usr/bin/wget --no-check-certificate --no-proxy --connect-timeout=30 -S --progress=dot:giga -O - (?P<img_url>http://\\d+\\.\\d+\\.\\d+\\.\\d+/tmp/\\d+/[\\w_-]+/juno.img)"
+  for: "/usr/bin/wget --no-check-certificate --no-proxy --connect-timeout=30 -S --progress=dot:giga -O - (?P<img_url>http://\\d+\\.\\d+\\.\\d+\\.\\d+/tmp/\\d+/[\\w_-]+/image/juno.img)"
   prompt: "lava-test: #"
   delay: 0
   jitter: 0.0001
