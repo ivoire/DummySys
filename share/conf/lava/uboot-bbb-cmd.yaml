@@ -42,19 +42,19 @@
   - "U-Boot# "
 
 - cmd: wait
-  for: "setenv loadkernel 'tftp \\$\\{kernel_addr_r\\} (?P<tftp_vmlinux>[\\w_/-]+vmlinuz)"
+  for: "setenv loadkernel 'tftp 0x82000000 (?P<tftp_vmlinux>[\\w_/-]+vmlinuz)"
   prompt: "U-Boot# "
   delay: 0
   jitter: 0.0005
 
 - cmd: wait
-  for: "setenv loadinitrd 'tftp \\$\\{initrd_addr_r\\} (?P<tftp_ramdisk>[\\w_/-]+ramdisk.cpio.gz.uboot)"
+  for: "setenv loadinitrd 'tftp 0x83000000 (?P<tftp_ramdisk>[\\w_/-]+ramdisk.cpio.gz.uboot)"
   prompt: "U-Boot# "
   delay: 0
   jitter: 0.0005
 
 - cmd: wait
-  for: "setenv loadfdt 'tftp \\$\\{fdt_addr_r\\} (?P<tftp_dtb>[\\w_/-]+am335x-boneblack.dtb)"
+  for: "setenv loadfdt 'tftp 0x88000000 (?P<tftp_dtb>[\\w_/-]+am335x-boneblack.dtb)"
   prompt: "U-Boot# "
   delay: 0
   jitter: 0.0005
