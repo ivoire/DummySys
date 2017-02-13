@@ -1,0 +1,146 @@
+- cmd: print
+  delay: 0
+  jitter: 0.0005
+  lines:
+  - "Trying ::1..."
+  - "Trying 127.0.0.1..."
+  - "Connected to localhost."
+  - "Escape character is '^]'."
+  - "\0"
+  - "U-Boot SPL 2014.04-00014-g47880f5 (Apr 22 2014 - 13:23:54)"
+  - "reading args"
+  - "spl_load_image_fat_os: error reading image args, err - -1"
+  - "reading u-boot.img"
+  - "reading u-boot.img"
+  - ""
+  - "U-Boot 2014.04-00014-g47880f5 (Apr 22 2014 - 13:23:54)"
+  - "I2C:   ready"
+  - "DRAM:  512 MiB"
+  - "NAND:  0 MiB"
+  - "MMC:   OMAP SD/MMC: 0, OMAP SD/MMC: 1"
+  - "*** Warning - readenv() failed, using default environment"
+  - "Net:   <ethaddr> not set. Validating first E-fuse MAC"
+  - "cpsw, usb_ether"
+  - "Hit any key to stop autoboot:  1  "
+
+- cmd: print
+  interrupt: True
+  delay: 0
+  jitter: 0.05
+  lines:
+  - "Hit any key to stop autoboot:  2  "
+  - "Hit any key to stop autoboot:  3  "
+  - "Hit any key to stop autoboot:  4  "
+  - "Hit any key to stop autoboot:  5  "
+  - "Hit any key to stop autoboot:  6  "
+  - "Hit any key to stop autoboot:  7  "
+
+- cmd: print
+  delay: 0
+  jitter: 0.0005
+  lines:
+  - "U-Boot# "
+
+- cmd: wait
+  for: "setenv loadkernel 'tftp 0x82000000 (?P<tftp_vmlinux>[\\w_/-]+vmlinuz)"
+  prompt: "U-Boot# "
+  delay: 0
+  jitter: 0.0005
+
+- cmd: wait
+  for: "setenv loadinitrd 'tftp 0x83000000 (?P<tftp_ramdisk>[\\w_/-]+ramdisk.cpio.gz.uboot)"
+  prompt: "U-Boot# "
+  delay: 0
+  jitter: 0.0005
+
+- cmd: wait
+  for: "setenv loadfdt 'tftp 0x88000000 (?P<tftp_dtb>[\\w_/-]+am335x-boneblack.dtb)"
+  prompt: "U-Boot# "
+  delay: 0
+  jitter: 0.0005
+
+- cmd: wait
+  for: "setenv nfsargs 'setenv bootargs console=ttyO0,115200n8 root=/dev/nfs rw nfsroot=(?P<server_ip>\\d+\\.\\d+\\.\\d+\\.\\d+):/var/lib/lava/dispatcher/tmp/(?P<nfs_tmpdir>\\d+/[\\w_-]+),tcp,hard,intr  ip=dhcp'"
+  prompt: "U-Boot# "
+  delay: 0
+  jitter: 0.0005
+
+- cmd: wait
+  for: "boot"
+  prompt: "U-Boot# "
+  delay: 0
+  jitter: 0.05
+
+- cmd: print
+  delay: 0
+  jitter: 0.00001
+  lines:
+  - "link up on port 0, speed 100, full duplex"
+  - "BOOTP broadcast 1"
+  - "DHCP client bound to address {board_ip}"
+  - "link up on port 0, speed 100, full duplex"
+  - "Using cpsw device"
+  - "TFTP from server {server_ip}; our IP address is {board_ip}"
+  - "Filename '{tftp_vmlinux}'."
+
+- cmd: execute
+  args:
+  - "python3"
+  - "/home/ivoire/projects/DummySys/share/utils/tftp.get.py"
+  - "--host"
+  - "{server_ip}"
+  - "{tftp_vmlinux}"
+  quit_on:
+    1: "Unable to download the file"
+
+- cmd: print
+  delay: 0
+  jitter: 0.00001
+  lines:
+  - "Load address: 0x82000000"
+  - "Loading: *\b#################################################################"
+  - "\t #################################################################"
+  - "\t #################################################################"
+  - "\t ######################"
+  - "\t 4 MiB/s"
+  - "done"
+  - "Bytes transferred = 3182192 (308e70 hex)"
+  - "link up on port 0, speed 100, full duplex"
+  - "Using cpsw device"
+  - "TFTP from server {server_ip}; our IP address is {board_ip}"
+  - "Filename '{tftp_ramdisk}'."
+
+- cmd: print
+  delay: 0
+  jitter: 0.00001
+  lines:
+  - "Load address: 0x8200000"
+  - "Loading: #data abort"
+  - "pc : [<9f787188>] lr : [<00000027>]"
+  - "sp : 9f62aa4c ip : 08200000 fp : 9ffef650"
+  - "r10: 9ffef644 r9 : 9f62af28 r8 : 9f7a3450"
+  - "r7 : 000005bc r6 : 9ffece04 r5 : 000005bc r4 : 9ffee12a"
+  - "r3 : 00000000 r2 : 000005bc r1 : 9ffee12e r0 : 08200000"
+  - "Flags: Nzcv IRQs off FIQs on Mode SVC_32"
+  - "Resetting CPU ..."
+  - ""
+  - "resetting ..."
+  - ""
+  - "U-Boot SPL 2014.04-00014-g47880f5 (Apr 22 2014 - 13:23:54)"
+  - "reading args"
+  - "spl_load_image_fat_os: error reading image args, err - -1"
+  - "reading u-boot.img"
+  - "reading u-boot.img"
+  - ""
+  - "U-Boot 2014.04-00014-g47880f5 (Apr 22 2014 - 13:23:54)"
+  - "I2C:   ready"
+  - "DRAM:  512 MiB"
+  - "NAND:  0 MiB"
+  - "MMC:   OMAP SD/MMC: 0, OMAP SD/MMC: 1"
+  - "*** Warning - readenv() failed, using default environment"
+  - "Net:   <ethaddr> not set. Validating first E-fuse MAC"
+  - "cpsw, usb_ether"
+  - "Hit any key to stop autoboot:  1  "
+
+- cmd: sleep
+  value: 5
