@@ -57,29 +57,29 @@
   delay: 0
   jitter: 0.0005
   lines:
-  - "B2260> "
+  - "=> "
 
 - cmd: wait
   for: "setenv loadkernel 'tftp 0x60000000 (?P<tftp_vmlinux>[\\w_/-]+uImage)"
-  prompt: "B2260> "
+  prompt: "=> "
   delay: 0
   jitter: 0.0005
 
 - cmd: wait
   for: "setenv loadfdt 'tftp 0x47000000 (?P<tftp_dtb>[\\w_/-]+stih410-b2260.dtb)"
-  prompt: "B2260> "
+  prompt: "=> "
   delay: 0
   jitter: 0.0005
 
 - cmd: wait
   for: "setenv nfsargs 'setenv bootargs console=ttyAS1,115200n8 root=/dev/nfs rw nfsroot=(?P<server_ip>\\d+\\.\\d+\\.\\d+\\.\\d+):/var/lib/lava/dispatcher/tmp/(?P<nfs_tmpdir>\\d+/[\\w_-]+),tcp,hard,intr"
-  prompt: "B2260> "
+  prompt: "=> "
   delay: 0
   jitter: 0.0005
 
 - cmd: wait
   for: "boot"
-  prompt: "B2260> "
+  prompt: "=> "
   delay: 0
   jitter: 0.05
 
