@@ -1,0 +1,85 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# vim: set ts=4
+
+# Copyright 2017 Rémi Duraffort
+# This file is part of DummySys.
+#
+# DummySys is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# DummySys is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with DummySys.  If not, see <http://www.gnu.org/licenses/>
+
+import argparse
+import logging
+import os
+import sys
+import yaml
+
+from DummySys.utils import parse_log_level
+from DummySys.fsm import FSM
+
+# Logging level
+FORMAT = "%(asctime)-15s [%(levelname)s] %(message)s"
+
+
+def main():
+    # Configure the argument parser
+    parser = argparse.ArgumentParser(description="lava-board")
+    parser.add_argument("--verbose", "-v", action="count",
+                        dest="verbosity", default=0,
+                        help="Print verbose debug statements")
+    parser.add_argument("--reset", "-r", action="store_true",
+                        dest="reset", default=False,
+                        help="Issue USB Reset signalling once we're finished")
+
+    parser.add_argument("--serial", "-S", required=True,
+                        help="Specify Serial String of DFU device")
+    parser.add_argument("--device", "-d", required=True,
+                        help="Specify Vendor/Product ID(s) of DFU device")
+    parser.add_argument("--alt", "-a",
+                        help="Specify the Altsetting of the DFU Interface by name or by number")
+    parser.add_argument("--download", "-D",
+                        help="Write firmware from <file> into device")
+
+    parser.add_argument("--level", "-l", type=str, default="INFO",
+                        choices=["DEBUG", "INFO", "WARN", "ERROR"],
+                        help="Log level; default to INFO")
+    args = parser.parse_args()
+
+    # Configure the logger
+    LOG = logging.getLogger("DummySys")
+    LOG.setLevel(parse_log_level(args.level))
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(logging.Formatter(FORMAT))
+    LOG.addHandler(handler)
+
+    LOG.info(args)
+
+    # Start the state machine
+    LOG.debug("Loading the commands at %s", args.alt)
+    cmds = []
+    ctx = {}
+    filename = os.path.join(os.path.dirname(__file__),
+                            "share", "conf", "dfu-util", args.alt) + ".yaml"
+    with open(filename, "r") as f_in:
+        cmds = yaml.load(f_in.read())
+
+    if not isinstance(cmds, list):
+        LOG.error("The command should be a list.")
+        return
+
+    # Start with an empty context
+    fsm = FSM(cmds, 0, 0.00001, ctx)
+    fsm.run()
+
+if __name__ == "__main__":
+    main()
