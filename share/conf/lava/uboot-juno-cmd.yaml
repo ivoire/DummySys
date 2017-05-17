@@ -188,7 +188,7 @@
   jitter: 0.0005
 
 - cmd: wait
-  for: boot
+  for: "run bootcmd"
   delay: 0
   jitter: 0.0005
   prompt: "VExpress64# "
@@ -1023,7 +1023,7 @@
   jitter: 0.0005
 
 - cmd: wait
-  for: boot
+  for: "run bootcmd"
   delay: 0
   jitter: 0.0005
   prompt: "VExpress64# "

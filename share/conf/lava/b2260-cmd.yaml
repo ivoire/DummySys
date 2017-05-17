@@ -78,7 +78,7 @@
   jitter: 0.0005
 
 - cmd: wait
-  for: "boot"
+  for: "run bootcmd"
   prompt: "=> "
   delay: 0
   jitter: 0.05

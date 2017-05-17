@@ -162,7 +162,7 @@
   - "VExpress64# " 
 
 - cmd: wait
-  for: "boot"
+  for: "run bootcmd"
   prompt: "VExpress64# "
   delay: 0
   jitter: 0.0005
