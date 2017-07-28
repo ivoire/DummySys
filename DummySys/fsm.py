@@ -18,6 +18,7 @@
 # along with DummySys.  If not, see <http://www.gnu.org/licenses/>
 
 import logging
+import os
 import random
 import re
 import select
@@ -72,6 +73,16 @@ class FSM(object):
 
     def cmd_execute(self, conf):
         args = []
+        # Check the program path
+        prog = conf["args"][0]
+        if prog.startswith("./"):
+            # The program path is absolute, change it to be relative to the
+            # DummySys base directory.
+            path = os.path.join(os.path.dirname(__file__), "..",
+                                os.path.dirname(prog),
+                                os.path.basename(prog))
+            conf["args"][0] = os.path.abspath(path)
+
         for arg in conf["args"]:
             args.append(arg.format(**self.ctx))
         ret = subprocess.call(args)

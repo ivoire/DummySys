@@ -86,7 +86,7 @@
 - cmd: execute
   args:
   - "python3"
-  - "/home/ivoire/projects/DummySys/share/utils/tftp.get.py"
+  - "./share/utils/tftp.get.py"
   - "--host"
   - "{server_ip}"
   - "{tftp_vmlinux}"

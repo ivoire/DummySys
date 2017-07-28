@@ -86,7 +86,7 @@
 - cmd: execute
   args:
   - "python3"
-  - "/home/ivoire/projects/DummySys/share/utils/tftp.get.py"
+  - "./share/utils/tftp.get.py"
   - "--host"
   - "{server_ip}"
   - "{tftp_vmlinux}"
@@ -114,7 +114,7 @@
 - cmd: execute
   args:
   - "python3"
-  - "/home/ivoire/projects/DummySys/share/utils/tftp.get.py"
+  - "./share/utils/tftp.get.py"
   - "--host"
   - "{server_ip}"
   - "{tftp_ramdisk}"
@@ -175,7 +175,7 @@
 - cmd: execute
   args:
   - "python3"
-  - "/home/ivoire/projects/DummySys/share/utils/tftp.get.py"
+  - "./share/utils/tftp.get.py"
   - "--host"
   - "{server_ip}"
   - "{tftp_dtb}"
@@ -437,7 +437,7 @@
 - cmd: execute
   args:
   - "python3"
-  - "/home/ivoire/projects/DummySys/share/utils/mount.py"
+  - "./share/utils/mount.py"
   - "--host"
   - "{server_ip}"
   - "--path"
