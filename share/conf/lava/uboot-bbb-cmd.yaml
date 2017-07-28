@@ -92,6 +92,7 @@
   - "{tftp_vmlinux}"
   quit_on:
     1: "Unable to download the file"
+    2: "Unable to find the script"
 
 - cmd: print
   delay: 0
@@ -119,6 +120,7 @@
   - "{tftp_ramdisk}"
   quit_on:
     1: "Unable to download the file"
+    2: "Unable to find the script"
 
 - cmd: print
   delay: 0
@@ -179,6 +181,7 @@
   - "{tftp_dtb}"
   quit_on:
     1: "Unable to download the file"
+    2: "Unable to find the script"
 
 - cmd: print
   delay: 0
@@ -442,6 +445,7 @@
   - "{nfs_tmpdir}/bin/bash"
   quit_on:
     1: "Unable to mount the nfs rootfs"
+    2: "Unable to find the script"
 
 - cmd: print
   delay: 0

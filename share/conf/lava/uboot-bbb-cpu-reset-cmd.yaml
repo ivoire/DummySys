@@ -92,6 +92,7 @@
   - "{tftp_vmlinux}"
   quit_on:
     1: "Unable to download the file"
+    2: "Unable to find the script"
 
 - cmd: print
   delay: 0
