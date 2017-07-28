@@ -85,7 +85,6 @@
 
 - cmd: execute
   args:
-  - "python3"
   - "./share/utils/tftp.get.py"
   - "--host"
   - "{server_ip}"
@@ -113,7 +112,6 @@
 
 - cmd: execute
   args:
-  - "python3"
   - "./share/utils/tftp.get.py"
   - "--host"
   - "{server_ip}"
@@ -174,7 +172,6 @@
 
 - cmd: execute
   args:
-  - "python3"
   - "./share/utils/tftp.get.py"
   - "--host"
   - "{server_ip}"
@@ -436,7 +433,6 @@
 
 - cmd: execute
   args:
-  - "python3"
   - "./share/utils/mount.py"
   - "--host"
   - "{server_ip}"

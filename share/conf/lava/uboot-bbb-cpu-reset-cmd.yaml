@@ -85,7 +85,6 @@
 
 - cmd: execute
   args:
-  - "python3"
   - "./share/utils/tftp.get.py"
   - "--host"
   - "{server_ip}"
