@@ -36,7 +36,7 @@ def main():
     parser.add_argument("--commands", "-c", type=str, required=True,
                         help="Commands file")
     parser.add_argument("--delay", "-d", type=float,
-                        default=0.01, help="Delay when writing on the console")
+                        default=0.0001, help="Delay when writing on the console")
     parser.add_argument("--jitter", "-j", type=float,
                         default=0.01, help="Jitter when writing on the console")
     parser.add_argument("--context", type=str,
