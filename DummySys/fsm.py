@@ -89,6 +89,7 @@ class FSM(object):
         for arg in conf["args"]:
             args.append(arg.format(**self.ctx))
         ret = subprocess.call(args)
+        # TODO: allow for a continue_on
         if ret in conf["quit_on"]:
             msg = conf["quit_on"][ret]
             raise Exception(msg)
@@ -118,7 +119,7 @@ class FSM(object):
 
     def cmd_wait(self, conf):
         self.LOG.debug(" for: %s", conf["for"])
-        for_data = ["\n", conf["for"]]
+        for_data = ["\n", conf["for"] + "\n"]
         fail_string = conf.get("fail", False)
 
         while True:
