@@ -19,6 +19,8 @@
 
 import logging
 import os
+import pexpect
+import pexpect.fdpexpect
 import random
 import re
 import select
@@ -31,6 +33,7 @@ import time
 class FSM(object):
     def __init__(self, cmds, delay, jitter, ctx):
         self.cmds = cmds
+        self.expect = pexpect.fdpexpect.fdspawn(sys.stdin.fileno(), encoding="utf-8")
         self.delay = delay
         self.jitter = jitter
         self.ctx = ctx
@@ -115,19 +118,17 @@ class FSM(object):
 
     def cmd_wait(self, conf):
         self.LOG.debug(" for: %s", conf["for"])
-        regexp = re.compile(conf["for"])
-        echo = conf.get("echo", False)
+        for_data = ["\n", conf["for"]]
         fail_string = conf.get("fail", False)
 
         while True:
-            data = input(conf["prompt"])
-            m = regexp.match(data)
-            if echo:
-                self._out(data, self._delay(conf))
+            sys.stdout.write(conf["prompt"])
+            sys.stdout.flush()
+            index = self.expect.expect(for_data)
+            if index == 0:
+                if fail_string:
+                    self._out(fail_string, self._delay(conf))
+                continue
 
-            if m is not None:
-                self.ctx.update(m.groupdict())
-                break
-
-            if fail_string:
-                self._out(fail_string, self._delay(conf))
+            self.ctx.update(self.expect.match.groupdict())
+            return
