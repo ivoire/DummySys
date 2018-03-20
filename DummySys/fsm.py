@@ -27,7 +27,9 @@ import select
 import subprocess
 import sys
 import tarfile
+import termios
 import time
+import tty
 
 
 class FSM(object):
@@ -119,17 +121,28 @@ class FSM(object):
 
     def cmd_wait(self, conf):
         self.LOG.debug(" for: %s", conf["for"])
-        for_data = ["\n", conf["for"] + "\n"]
         fail_string = conf.get("fail", False)
+        newline = conf.get("newline", True)
 
-        while True:
-            sys.stdout.write(conf["prompt"])
-            sys.stdout.flush()
-            index = self.expect.expect(for_data)
-            if index == 0:
-                if fail_string:
-                    self._out(fail_string, self._delay(conf))
-                continue
+        if newline:
+            for_data = ["\n", conf["for"] + "\n"]
+        else:
+            for_data = ["\n", conf["for"]]
+            tattr = termios.tcgetattr(sys.stdin.fileno())
+            tty.setcbreak(sys.stdin.fileno())
 
-            self.ctx.update(self.expect.match.groupdict())
-            return
+        try:
+            while True:
+                sys.stdout.write(conf["prompt"])
+                sys.stdout.flush()
+                index = self.expect.expect(for_data)
+                if index == 0:
+                    if fail_string:
+                        self._out(fail_string, self._delay(conf))
+                    continue
+
+                self.ctx.update(self.expect.match.groupdict())
+                return
+        finally:
+            if not newline:
+                termios.tcsetattr(sys.stdin.fileno(), termios.TCSANOW, tattr)
