@@ -1,0 +1,21 @@
+#!/usr/bin/python3
+
+import hashlib
+import sys
+
+
+def main():
+    filename = sys.argv[1]
+    expected_digest = sys.argv[2]
+
+    m = hashlib.sha256()
+    with open(filename, "rb") as f_in:
+        m.update(f_in.read())
+    if m.hexdigest() == expected_digest:
+        return 0
+    else:
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
