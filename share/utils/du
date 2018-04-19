@@ -1,0 +1,15 @@
+#!/usr/bin/python3
+
+import pathlib
+import sys
+
+
+def main():
+    if pathlib.Path(sys.argv[1]).stat().st_size == int(sys.argv[2]):
+        return 0
+    else:
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
