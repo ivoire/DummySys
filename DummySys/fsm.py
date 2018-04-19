@@ -130,6 +130,7 @@ class FSM(object):
             for_data = ["\n", conf["for"]]
             tattr = termios.tcgetattr(sys.stdin.fileno())
             tty.setcbreak(sys.stdin.fileno())
+            tty.setraw(sys.stdin.fileno())
 
         try:
             while True:
