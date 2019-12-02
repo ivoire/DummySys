@@ -123,6 +123,7 @@ class FSM(object):
         self.LOG.debug(" for: %s", conf["for"])
         fail_string = conf.get("fail", False)
         newline = conf.get("newline", True)
+        retries = conf.get("retries")
 
         if newline:
             for_data = ["\n", conf["for"] + "\n"]
@@ -134,10 +135,14 @@ class FSM(object):
 
         try:
             while True:
+                if retries is not None and retries < 0:
+                    raise Exception("Too many retries")
                 sys.stdout.write(conf["prompt"])
                 sys.stdout.flush()
                 index = self.expect.expect(for_data)
                 if index == 0:
+                    if retries is not None:
+                        retries = retries - 1
                     if fail_string:
                         self._out(fail_string, self._delay(conf))
                     continue
