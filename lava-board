@@ -58,7 +58,7 @@ def main():
     cmds = []
     ctx = {}
     with open(args.commands, "r") as f_in:
-        cmds = yaml.load(f_in.read())
+        cmds = yaml.safe_load(f_in.read())
     if args.context is not None:
         with open(args.context, "r") as f_in:
             ctx = yaml.load(f_in.read())
