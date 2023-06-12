@@ -41,12 +41,10 @@ def main():
     base_dir = os.getcwd()
     os.chdir(tmp)
 
-    p = pexpect.spawn("tftp", encoding="utf-8")
-    p.expect("tftp> ")
-    p.sendline("connect %s %d" % (args.host, args.port))
+    p = pexpect.spawn(f"tftp {args.host} {args.port}", encoding="utf-8")
     p.expect("tftp> ")
     p.sendline("get %s" % args.file[0])
-    ret = p.expect(["Received \d+ bytes in \d+\.\d+ seconds",
+    ret = p.expect(["tftp> ",
                     "Error code \d+: [\w\s]+"])
 
     # Restore the working directory
