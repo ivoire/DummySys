@@ -35,10 +35,6 @@ import tty
 class FSM(object):
     def __init__(self, cmds, delay, jitter, ctx):
         self.cmds = cmds
-        # Use raw and cbrek for stdin
-        tattr = termios.tcgetattr(sys.stdin.fileno())
-        tty.setcbreak(sys.stdin.fileno())
-        tty.setraw(sys.stdin.fileno())
         self.expect = pexpect.fdpexpect.fdspawn(sys.stdin.fileno(), encoding="utf-8")
         self.delay = delay
         self.jitter = jitter
@@ -133,19 +129,26 @@ class FSM(object):
             for_data = ["\n", conf["for"] + "\n"]
         else:
             for_data = ["\n", conf["for"]]
+            tattr = termios.tcgetattr(sys.stdin.fileno())
+            tty.setcbreak(sys.stdin.fileno())
+            tty.setraw(sys.stdin.fileno())
 
-        while True:
-            if retries is not None and retries < 0:
-                raise Exception("Too many retries")
-            sys.stdout.write(conf["prompt"])
-            sys.stdout.flush()
-            index = self.expect.expect(for_data)
-            if index == 0:
-                if retries is not None:
-                    retries = retries - 1
-                if fail_string:
-                    self._out(fail_string, self._delay(conf))
-                continue
+        try:
+            while True:
+                if retries is not None and retries < 0:
+                    raise Exception("Too many retries")
+                sys.stdout.write(conf["prompt"])
+                sys.stdout.flush()
+                index = self.expect.expect(for_data)
+                if index == 0:
+                    if retries is not None:
+                        retries = retries - 1
+                    if fail_string:
+                        self._out(fail_string, self._delay(conf))
+                    continue
 
-            self.ctx.update(self.expect.match.groupdict())
-            return
+                self.ctx.update(self.expect.match.groupdict())
+                return
+        finally:
+            if not newline:
+                termios.tcsetattr(sys.stdin.fileno(), termios.TCSANOW, tattr)
